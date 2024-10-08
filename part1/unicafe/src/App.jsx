@@ -16,6 +16,7 @@ const Display = ( {text, value} ) => {
 }
 
 const Statistics = ( {types, statisticsTypes} ) => {  
+  if (statisticsTypes[0].function === 0) return "No feedback given"
   return (
     <>
       <Display text={types[0].name} value={types[0].value} />
@@ -33,38 +34,6 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
-
-  const activityObject = {
-    headers: ["give feedback", "statistics"],
-    types: [
-      {
-        name: "good",
-        value: good
-      },
-      {
-        name: "neutral",
-        value: good
-      },
-      {
-        name: "bad",
-        value: good
-      }
-    ],
-    statisticsTypes: [
-      {
-        name: "all",
-        function: all()
-      },
-      {
-        name: "average",
-        function: average()
-      },
-      {
-        name: "positive",
-        function: positive()
-      }
-    ]
-  } 
 
   const increaseGood = () => {
     console.log(good)
@@ -97,6 +66,38 @@ const App = () => {
     if (all() === 0) return 0
     return (good / all()) * 100
   }
+  
+  const activityObject = {
+    headers: ["give feedback", "statistics"],
+    types: [
+      {
+        name: "good",
+        value: good
+      },
+      {
+        name: "neutral",
+        value: good
+      },
+      {
+        name: "bad",
+        value: good
+      }
+    ],
+    statisticsTypes: [
+      {
+        name: "all",
+        function: all()
+      },
+      {
+        name: "average",
+        function: average()
+      },
+      {
+        name: "positive",
+        function: positive()
+      }
+    ]
+  } 
 
   return (
     <div>
