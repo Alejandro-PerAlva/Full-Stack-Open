@@ -21,6 +21,9 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const headers = ["give feedback", "statistics"] 
+  const types = ["good", "neutral", "bad"]
+
   const increaseGood = () => {
     console.log(good)
     setGood(good+1)
@@ -38,14 +41,14 @@ const App = () => {
 
   return (
     <div>
-      <Header text="give feedback" />
-      <Button handleClick={increaseGood} text="good" />
-      <Button handleClick={increaseNeutral} text="neutral" />
-      <Button handleClick={increaseBad} text="bad" />
-      <Header text="statistics" />
-      <Display text="good" value={good} />
-      <Display text="neutral" value={neutral} />
-      <Display text="bad" value={bad} />
+      <Header text={headers[0]} />
+      <Button handleClick={increaseGood} text={types[0]} />
+      <Button handleClick={increaseNeutral} text={types[1]} />
+      <Button handleClick={increaseBad} text={types[2]} />
+      <Header text={headers[1]} />
+      <Display text={types[0]} value={good} />
+      <Display text={types[1]} value={neutral} />
+      <Display text={types[2]} value={bad} />
     </div>
   )
 }
