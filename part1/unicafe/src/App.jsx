@@ -10,10 +10,10 @@ const Button = ( {handleClick, text} ) => {
   return <button onClick={handleClick}>{text}</button>
 }
 
-const StatisticLine  = ( {text, value} ) => {
+/*const StatisticLine  = ( {text, value} ) => {
   console.log(text, value)
   return <p>{text} {value}</p>
-}
+}*/
 
 const Statistics = ( {types, statisticsTypes} ) => {  
   if (statisticsTypes[0].function === 0) return "No feedback given"
