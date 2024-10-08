@@ -18,14 +18,34 @@ const StatisticLine  = ( {text, value} ) => {
 const Statistics = ( {types, statisticsTypes} ) => {  
   if (statisticsTypes[0].function === 0) return "No feedback given"
   return (
-    <>
-      <StatisticLine text={types[0].name} value={types[0].value} />
-      <StatisticLine text={types[1].name} value={types[1].value} />
-      <StatisticLine text={types[2].name} value={types[2].value} />
-      <StatisticLine text={statisticsTypes[0].name} value={statisticsTypes[0].function} />
-      <StatisticLine text={statisticsTypes[1].name} value={statisticsTypes[1].function} />
-      <StatisticLine text={statisticsTypes[2].name} value={statisticsTypes[2].function} />
-    </>
+  <table>
+    <tbody>
+      <tr>
+        <td>{types[0].name}</td>
+        <td>{types[0].value}</td>
+      </tr>
+      <tr>
+        <td>{types[1].name}</td>
+        <td>{types[1].value}</td>
+      </tr>
+      <tr>
+        <td>{types[2].name}</td>
+        <td>{types[2].value}</td>
+      </tr>
+      <tr>
+        <td>{statisticsTypes[0].name}</td>
+        <td>{statisticsTypes[0].function}</td>
+      </tr>
+      <tr>
+        <td>{statisticsTypes[1].name}</td>
+        <td>{statisticsTypes[1].function}</td>
+      </tr>
+      <tr>
+        <td>{statisticsTypes[2].name}</td>
+        <td>{statisticsTypes[2].function}</td>
+      </tr>
+    </tbody>
+  </table>
   )
 }
 
@@ -58,13 +78,13 @@ const App = () => {
   const average = () => {
     console.log((good - bad) / all())
     if (all() === 0) return 0
-    return (good - bad) / all()  
+    return ((good - bad) / all()).toFixed(2) 
   }
 
   const positive = () => {
     console.log()
-    if (all() === 0) return 0
-    return (good / all()) * 100
+    if (all() === 0) return "0%"
+    return ((good / all()) * 100).toFixed(2)  + "%"
   }
   
   const activityObject = {
@@ -76,11 +96,11 @@ const App = () => {
       },
       {
         name: "neutral",
-        value: good
+        value: neutral
       },
       {
         name: "bad",
-        value: good
+        value: bad
       }
     ],
     statisticsTypes: [
