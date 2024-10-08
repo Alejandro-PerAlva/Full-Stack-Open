@@ -15,15 +15,56 @@ const Display = ( {text, value} ) => {
   return <p>{text} {value}</p>
 }
 
+const Statistics = ( {types, statisticsTypes} ) => {  
+  return (
+    <>
+      <Display text={types[0].name} value={types[0].value} />
+      <Display text={types[1].name} value={types[1].value} />
+      <Display text={types[2].name} value={types[2].value} />
+      <Display text={statisticsTypes[0].name} value={statisticsTypes[0].function} />
+      <Display text={statisticsTypes[1].name} value={statisticsTypes[1].function} />
+      <Display text={statisticsTypes[2].name} value={statisticsTypes[2].function} />
+    </>
+  )
+}
+
 const App = () => {
   
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  const headers = ["give feedback", "statistics"] 
-  const types = ["good", "neutral", "bad"]
-  const statisticsTypes = ["all", "average", "positive"]
+  const activityObject = {
+    headers: ["give feedback", "statistics"],
+    types: [
+      {
+        name: "good",
+        value: good
+      },
+      {
+        name: "neutral",
+        value: good
+      },
+      {
+        name: "bad",
+        value: good
+      }
+    ],
+    statisticsTypes: [
+      {
+        name: "all",
+        function: all()
+      },
+      {
+        name: "average",
+        function: average()
+      },
+      {
+        name: "positive",
+        function: positive()
+      }
+    ]
+  } 
 
   const increaseGood = () => {
     console.log(good)
@@ -53,22 +94,18 @@ const App = () => {
 
   const positive = () => {
     console.log()
+    if (all() === 0) return 0
     return (good / all()) * 100
   }
 
   return (
     <div>
-      <Header text={headers[0]} />
-      <Button handleClick={increaseGood} text={types[0]} />
-      <Button handleClick={increaseNeutral} text={types[1]} />
-      <Button handleClick={increaseBad} text={types[2]} />
-      <Header text={headers[1]} />
-      <Display text={types[0]} value={good} />
-      <Display text={types[1]} value={neutral} />
-      <Display text={types[2]} value={bad} />
-      <Display text={statisticsTypes[0]} value={all()} />
-      <Display text={statisticsTypes[1]} value={average()} />
-      <Display text={statisticsTypes[2]} value={positive()} />
+      <Header text={activityObject.headers[0]} />
+      <Button handleClick={increaseGood} text={activityObject.types[0].name} />
+      <Button handleClick={increaseNeutral} text={activityObject.types[1].name} />
+      <Button handleClick={increaseBad} text={activityObject.types[2].name} />
+      <Header text={activityObject.headers[1]} />
+      <Statistics types={activityObject.types} statisticsTypes={activityObject.statisticsTypes}/>
     </div>
   )
 }
