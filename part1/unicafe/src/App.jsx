@@ -16,13 +16,14 @@ const Display = ( {text, value} ) => {
 }
 
 const App = () => {
-  // guarda los clics de cada botón en su propio estado
+  
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
   const headers = ["give feedback", "statistics"] 
   const types = ["good", "neutral", "bad"]
+  const statisticsTypes = ["all", "average", "positive"]
 
   const increaseGood = () => {
     console.log(good)
@@ -39,6 +40,22 @@ const App = () => {
     setBad(bad+1)
   }
 
+  const all = () => {
+    console.log(good + neutral + bad)
+    return good + neutral + bad
+  }
+
+  const average = () => {
+    console.log((good - bad) / all())
+    if (all() === 0) return 0
+    return (good - bad) / all()  
+  }
+
+  const positive = () => {
+    console.log()
+    return (good / all()) * 100
+  }
+
   return (
     <div>
       <Header text={headers[0]} />
@@ -49,6 +66,9 @@ const App = () => {
       <Display text={types[0]} value={good} />
       <Display text={types[1]} value={neutral} />
       <Display text={types[2]} value={bad} />
+      <Display text={statisticsTypes[0]} value={all()} />
+      <Display text={statisticsTypes[1]} value={average()} />
+      <Display text={statisticsTypes[2]} value={positive()} />
     </div>
   )
 }
