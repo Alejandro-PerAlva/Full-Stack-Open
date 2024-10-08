@@ -10,7 +10,7 @@ const Button = ( {handleClick, text} ) => {
   return <button onClick={handleClick}>{text}</button>
 }
 
-const Display = ( {text, value} ) => {
+const StatisticLine  = ( {text, value} ) => {
   console.log(text, value)
   return <p>{text} {value}</p>
 }
@@ -19,12 +19,12 @@ const Statistics = ( {types, statisticsTypes} ) => {
   if (statisticsTypes[0].function === 0) return "No feedback given"
   return (
     <>
-      <Display text={types[0].name} value={types[0].value} />
-      <Display text={types[1].name} value={types[1].value} />
-      <Display text={types[2].name} value={types[2].value} />
-      <Display text={statisticsTypes[0].name} value={statisticsTypes[0].function} />
-      <Display text={statisticsTypes[1].name} value={statisticsTypes[1].function} />
-      <Display text={statisticsTypes[2].name} value={statisticsTypes[2].function} />
+      <StatisticLine text={types[0].name} value={types[0].value} />
+      <StatisticLine text={types[1].name} value={types[1].value} />
+      <StatisticLine text={types[2].name} value={types[2].value} />
+      <StatisticLine text={statisticsTypes[0].name} value={statisticsTypes[0].function} />
+      <StatisticLine text={statisticsTypes[1].name} value={statisticsTypes[1].function} />
+      <StatisticLine text={statisticsTypes[2].name} value={statisticsTypes[2].function} />
     </>
   )
 }
