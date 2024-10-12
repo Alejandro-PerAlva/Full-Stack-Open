@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import axios, { Axios } from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -12,7 +12,6 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    console.log('effect')
     axios
       .get('http://localhost:3001/persons')
       .then(response => {
@@ -20,7 +19,6 @@ const App = () => {
         setPersons(response.data)
       })
   }, [])
-  console.log('render', 'persons')
 
   const addName = (event) => {
     event.preventDefault()
@@ -32,12 +30,16 @@ const App = () => {
       const nameObject = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1
       }
 
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+      axios
+        .post('http://localhost:3001/persons', nameObject)
+        .then(response => {
+          console.log('promise fulfilled')
+          setPersons(persons.concat(nameObject))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 

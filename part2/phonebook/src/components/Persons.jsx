@@ -2,7 +2,8 @@ const Persons = ({ persons }) => {
   return (
     <div>
       {persons && persons.length > 0 
-        ? (persons.map(person => <Person key={person.id} person={person} />)) 
+        ? (persons.map((person, index) => 
+          <Person key={person.id || index} person={person} />)) 
         : (<p>No persons available</p>
       )}
     </div>
