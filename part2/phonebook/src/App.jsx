@@ -20,7 +20,7 @@ const App = () => {
       })
   }, [])
 
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
 
     const nameExists = persons.some(person => person.name === newName)
@@ -41,6 +41,24 @@ const App = () => {
           setNewNumber('')
         })
     }
+  }
+
+  const deletePerson = id => {
+    const person = persons.find(n => n.id === id)
+  
+    personService
+      .erase(id)
+      .then(initialPersons => {
+        console.log(initialPersons);
+        setPersons(persons.filter(n => n.id !== id))
+      })
+      .catch(error => {
+        console.log(error);
+        alert(
+          `the person '${person.content}' was already deleted from server`
+        )
+        setPersons(persons.filter(n => n.id !== id))
+      })
   }
 
   const handleNameChange = (event) => {
@@ -70,7 +88,7 @@ const App = () => {
       <h3>Add a new</h3>
 
       <PersonForm 
-        addName={addName} 
+        addName={addPerson} 
         newName={newName} 
         newNumber={newNumber} 
         handleNameChange={handleNameChange} 
@@ -79,7 +97,10 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={personsToShow} />
+      <Persons 
+        persons={personsToShow} 
+        deletePerson={deletePerson}
+      />
     </div>
   )
 }
