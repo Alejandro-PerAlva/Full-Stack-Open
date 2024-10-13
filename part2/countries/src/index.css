@@ -1,0 +1,67 @@
+.App {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+input {
+  padding: 10px;
+  width: 80%;
+  margin: 20px 0;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.result-container {
+  margin-top: 20px;
+}
+
+.country-item {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+}
+
+.country-item img {
+  width: 100px;
+  height: auto;
+}
+
+.country-detail {
+  padding: 20px;
+}
+
+.country-detail img {
+  width: 150px;
+  height: auto;
+}
+
+.country-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.country-item {
+  margin-bottom: 10px;
+}
+
+.country-detail {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+button {
+  margin-left: 10px;
+}
