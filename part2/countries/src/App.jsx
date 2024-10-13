@@ -5,7 +5,10 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [selectedCountry, setSelectedCountry] = useState(null) // Estado para manejar el país seleccionado
+  const [selectedCountry, setSelectedCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
+
+  const apiKey = import.meta.env.VITE_OPENWEATHERMAP_API_KEY
 
   useEffect(() => {
     if (searchQuery === '') {
@@ -48,9 +51,34 @@ const App = () => {
     console.log('Search query updated:', event.target.value)
   }
 
-  const handleShowDetails = (country) => {
+  const handleShowDetails = async (country) => {
     setSelectedCountry(country)
-    console.log(`Details for ${country.name.common} selected`)
+    console.log(`Details for ${selectedCountry} selected`)
+
+    // Obtener el clima si la capital está disponible
+    if (country.capital && country.capital.length > 0) {
+      const capital = country.capital[0]
+      await fetchWeatherData(capital)
+    }
+  }
+
+  const fetchWeatherData = async (capital) => {
+    try {
+      const weatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${apiKey}&units=metric&lang=en`
+      )
+      const weatherData = await weatherResponse.json()
+      console.log('Weather data received:', weatherData)
+
+      if (weatherData.cod === 200) {
+        setWeather(weatherData)
+      } else {
+        setWeather(null)
+      }
+    } catch (error) {
+      console.error('Error fetching weather data:', error)
+      setWeather(null)
+    }
   }
 
   const renderCountries = () => {
@@ -102,22 +130,20 @@ const App = () => {
         <p><strong>Capital:</strong> {country.capital ? country.capital[0] : 'N/A'}</p>
         <p><strong>Area:</strong> {country.area} km²</p>
         <p><strong>Languages:</strong> {Object.values(country.languages).join(', ')}</p>
-      </div>
-    )
-  }
 
-  const renderSelectedCountry = () => {
-    if (!selectedCountry) return null
-    const country = selectedCountry
-    const flagUrl = country.flags[0] || country.flags.png || country.flags.svg
-    console.log(`Displaying details for selected country: ${country.name.common}`)
-    return (
-      <div className="country-detail">
-        <h2>{country.name.common}</h2>
-        <img src={flagUrl} alt={country.name.common} />
-        <p><strong>Capital:</strong> {country.capital ? country.capital[0] : 'N/A'}</p>
-        <p><strong>Area:</strong> {country.area} km²</p>
-        <p><strong>Languages:</strong> {Object.values(country.languages).join(', ')}</p>
+        {weather ? (
+          <div className="weather-info">
+            <h3>Weather in {country.capital[0]}</h3>
+            <p><strong>Temperature:</strong> {weather.main.temp}°C</p>
+            <p><strong>Weather:</strong> {weather.weather[0].description}</p>
+            <img
+              src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
+              alt={weather.weather[0].description}
+            />
+          </div>
+        ) : (
+          <p>Weather data not available</p>
+        )}
       </div>
     )
   }
@@ -132,7 +158,6 @@ const App = () => {
         placeholder="Enter country name..."
       />
       <div className="result-container">{renderCountries()}</div>
-      {renderSelectedCountry()}
     </div>
   )
 }
