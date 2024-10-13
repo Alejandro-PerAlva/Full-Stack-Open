@@ -3,6 +3,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 
 const App = () => {
@@ -10,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     personService
@@ -36,6 +38,10 @@ const App = () => {
               setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
               setNewName('')
               setNewNumber('')
+              setSuccessMessage(`Updated ${returnedPerson.name}`)
+              setTimeout(() => {
+                setSuccessMessage(null)
+              }, 5000)
             })
           .catch(error => {
             console.error(error);
@@ -55,6 +61,10 @@ const App = () => {
           setPersons(persons.concat(initialPersons))
           setNewName('')
           setNewNumber('')
+          setSuccessMessage(`Added ${initialPersons.name}`)
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
         })
         .catch(error => {
           console.error(error);
@@ -103,7 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification message={successMessage} />
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 
       <h3>Add a new</h3>
