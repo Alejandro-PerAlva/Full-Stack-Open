@@ -11,7 +11,14 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
+  const [notification, setNotification] = useState(null)
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
   useEffect(() => {
     personService
@@ -20,6 +27,10 @@ const App = () => {
         console.log('promise fulfilled')
         setPersons(initialPersons)
       })
+      .catch(error => {
+        console.log(error)        
+        showNotification('Failed to retrieve data from the server', 'error')
+      });
   }, [])
 
   const addPerson = (event) => {
@@ -38,13 +49,11 @@ const App = () => {
               setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
               setNewName('')
               setNewNumber('')
-              setSuccessMessage(`Updated ${returnedPerson.name}`)
-              setTimeout(() => {
-                setSuccessMessage(null)
-              }, 5000)
+              showNotification(`Updated ${returnedPerson.name}`, 'success')
             })
           .catch(error => {
             console.error(error);
+            showNotification(`Error: ${newName} was already removed from server`, 'error')
             alert('Error updating person');
           });
       }
@@ -61,14 +70,11 @@ const App = () => {
           setPersons(persons.concat(initialPersons))
           setNewName('')
           setNewNumber('')
-          setSuccessMessage(`Added ${initialPersons.name}`)
-          setTimeout(() => {
-            setSuccessMessage(null)
-          }, 5000)
+          showNotification(`Added ${initialPersons.name}`, 'success')
         })
         .catch(error => {
-          console.error(error);
-          alert('Error creating person');
+          console.error(error)
+          showNotification('Failed to add the new person', 'error')
         });
     }
   }
@@ -81,12 +87,11 @@ const App = () => {
         .then(initialPersons => {
           console.log(initialPersons);
           setPersons(persons.filter(n => n.id !== id))
+          showNotification(`Deleted ${person.name}`, 'success')
         })
         .catch(error => {
           console.log(error);
-          alert(
-            `the person '${person.content}' was already deleted from server`
-          )
+          showNotification(`Error: ${person.name} was already deleted from the server`, 'error')
           setPersons(persons.filter(n => n.id !== id))
         })
       }
@@ -113,7 +118,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <Notification notification={notification} />
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 
       <h3>Add a new</h3>
