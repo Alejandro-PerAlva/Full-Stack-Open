@@ -17,7 +17,7 @@ const erase = (id) => {
 }
 
 const update = (id, newValue) => {
-    const request = axios.patch(`${baseUrl}/${id}`, newValue)
+    const request = axios.put(`${baseUrl}/${id}`, newValue)
     return request.then(response => response.data)
 }
 
