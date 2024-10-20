@@ -75,7 +75,7 @@ const App = () => {
         .catch(error => {
           console.error(error.response.data.error)
           showNotification(`Failed to add the new person ${error.response.data.error}`, 'error')
-        });
+        })
     }
   }
 
