@@ -50,13 +50,6 @@ app.get('/api/notes/:id', (request, response, next) => {
     })
     .catch(error => next(error))
 })
-
-  const generateId = () => {
-    const maxId = notes.length > 0
-      ? Math.max(...notes.map(n => n.id))
-      : 0
-    return maxId + 1
-  }
   
   app.post('/api/notes', (request, response, next) => {
     const body = request.body

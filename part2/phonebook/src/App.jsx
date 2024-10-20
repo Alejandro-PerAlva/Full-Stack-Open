@@ -73,8 +73,8 @@ const App = () => {
           showNotification(`Added ${initialPersons.name}`, 'success')
         })
         .catch(error => {
-          console.error(error)
-          showNotification('Failed to add the new person', 'error')
+          console.error(error.response.data.error)
+          showNotification(`Failed to add the new person ${error.response.data.error}`, 'error')
         });
     }
   }
