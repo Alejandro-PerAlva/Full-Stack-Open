@@ -4,19 +4,24 @@ import pluginReact from "eslint-plugin-react";
 
 export default [
   {
+    ignores: ["dis/*"],
     files: ["**/*.{js,mjs,cjs,jsx}"],
     languageOptions: {
       globals: {
         ...globals.browser,
-        require: "readonly", // Agrega require como global
-        process: "readonly", // Agrega process como global
+        require: "readonly",
+        process: "readonly",
       },
     },
     settings: {
       react: {
-        version: "detect", // Detecta la versión de React
+        version: "detect",
       },
     },
+  },
+  pluginJs.configs.recommended,
+  pluginReact.configs.flat.recommended,
+  {
     rules: {
       'eqeqeq': 'error',
       'no-trailing-spaces': 'error',
@@ -25,6 +30,4 @@ export default [
       'no-console': 0,
     },
   },
-  pluginJs.configs.recommended,
-  pluginReact.configs.flat.recommended,
-]
+];
