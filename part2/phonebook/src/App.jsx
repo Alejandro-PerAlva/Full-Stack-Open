@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -7,7 +7,7 @@ import Notification from './components/Notification'
 
 
 const App = () => {
-  const [persons, setPersons] = useState() 
+  const [persons, setPersons] = useState()
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
@@ -28,7 +28,7 @@ const App = () => {
         setPersons(initialPersons)
       })
       .catch(error => {
-        console.log(error)        
+        console.log(error)
         showNotification('Failed to retrieve data from the server', 'error')
       });
   }, [])
@@ -41,7 +41,7 @@ const App = () => {
       if (window.confirm(`${newName}`)) {
         const person = persons.find(n => n.name === newName)
         const updatedPerson = { ...person, number: newNumber }
-    
+
         personService
           .update(person.id, updatedPerson)
           .then(returnedPerson => {
@@ -81,7 +81,7 @@ const App = () => {
 
   const deletePerson = id => {
     const person = persons.find(n => n.id === id)
-    if(window.confirm(`Delete ${person.name}`)) { 
+    if(window.confirm(`Delete ${person.name}`)) {
       personService
         .erase(id)
         .then(initialPersons => {
@@ -123,18 +123,18 @@ const App = () => {
 
       <h3>Add a new</h3>
 
-      <PersonForm 
-        addName={addPerson} 
-        newName={newName} 
-        newNumber={newNumber} 
-        handleNameChange={handleNameChange} 
+      <PersonForm
+        addName={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
         handleNumberChange={handleNumberChange}
       />
 
       <h3>Numbers</h3>
 
-      <Persons 
-        persons={personsToShow} 
+      <Persons
+        persons={personsToShow}
         deletePerson={deletePerson}
       />
     </div>
