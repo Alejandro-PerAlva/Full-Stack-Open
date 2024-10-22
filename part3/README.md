@@ -1,3 +1,3 @@
 ## API URL
 
-[\[https://fso-exercises-p3.fly.dev](https://coursedata.fly.dev/)
+[\[https://full-stack-open-ksa7.onrender.com](https://full-stack-open-ksa7.onrender.com/)
