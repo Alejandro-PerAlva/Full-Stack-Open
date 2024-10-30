@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Note from './components/Note'
 import noteService from './services/notes'
 import Notification from './components/Notification'
 import Footer from './components/Footer'
+import LoginForm from './components/LoginForm'
+import NoteForm from './components/NotForm'
+import Togglable from './components/Togglable'
 import loginService from './services/login'
 
 const App = () => {
@@ -13,6 +16,9 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
+  const [loginVisible, setLoginVisible] = useState(false)
+
+  const noteFormRef = useRef()
 
   useEffect(() => {
     noteService
@@ -54,18 +60,12 @@ const App = () => {
     }
   }
 
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5,
-    }
-  
+  const addNote = (noteObject) => {
+    noteFormRef.current.toggleVisibility()
     noteService
       .create(noteObject)
-      .then(initialNotes => {
-        setNotes(notes.concat(initialNotes))
-        setNewNote('')
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
       })
   }
 
@@ -103,38 +103,35 @@ const App = () => {
     return null 
   }
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+
+    return (
       <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>log in</button>
+        </div>
+        <div style={showWhenVisible}>
+        <Togglable buttonLabel='login'>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+        </Togglable>
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
       </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
-  )
+    )
+  }
 
   const noteForm = () => (
-    <form onSubmit={addNote}>
-      <input
-        value={newNote}
-        onChange={handleNoteChange}
-      />
-      <button type="submit">save</button>
-    </form>  
+    <Togglable buttonLabel='new note' ref={noteFormRef}>
+      <NoteForm createNote={addNote} />
+    </Togglable>
   )
   
   return (
@@ -174,49 +171,5 @@ const App = () => {
     </div>
   )
 }
-/*
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-
-const App = () => {
-  const [value, setValue] = useState('')
-  const [rates, setRates] = useState({})
-  const [currency, setCurrency] = useState(null)
-
-  useEffect(() => {
-    console.log('effect run, currency is now', currency)
-
-    // omitir si la moneda no está definida
-    if (currency) {
-      console.log('fetching exchange rates...')
-      axios
-        .get(`https://open.er-api.com/v6/latest/${currency}`)
-        .then(response => {
-          setRates(response.data.rates)
-        })
-    }
-  }, [currency])
-
-  const handleChange = (event) => {
-    setValue(event.target.value)
-  }
-
-  const onSearch = (event) => {
-    event.preventDefault()
-    setCurrency(value)
-  }
-
-  return (
-    <div>
-      <form onSubmit={onSearch}>
-        currency: <input value={value} onChange={handleChange} />
-        <button type="submit">exchange rate</button>
-      </form>
-      <pre>
-        {JSON.stringify(rates, null, 2)}
-      </pre>
-    </div>
-  )
-}*/
 
 export default App
