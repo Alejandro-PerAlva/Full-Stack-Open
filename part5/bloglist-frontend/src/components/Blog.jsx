@@ -1,44 +1,29 @@
-// Blog.jsx
-import React, { useState } from 'react'
-import blogService from '../services/blogs'
+import { useState } from 'react'
 
-const Blog = ({ blog, setBlogs }) => {
-  const [showDetails, setShowDetails] = useState(false) // Estado para mostrar/ocultar detalles
+const Blog = ({ blog, updateLikes }) => {
+  const [visible, setVisible] = useState(false)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
+  const toggleVisibility = () => {
+    setVisible(!visible)
   }
 
   const handleLike = () => {
-    const updatedLikes = { likes: blog.likes + 1 }
-
-    blogService.update(blog.id, updatedLikes)
-      .then(updatedBlog => {
-        setBlogs(prevBlogs => 
-          prevBlogs.map(b => (b.id === updatedBlog.id ? updatedBlog : b))
-        )
-      })
-      .catch(error => {
-        console.error('Error updating likes:', error)
-      })
+    updateLikes(blog)
   }
 
   return (
-    <div style={blogStyle}>
+    <div>
       <div>
         {blog.title} {blog.author}
-        <button onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? 'hide' : 'show'} details
+        <button onClick={toggleVisibility}>
+          {visible ? 'show less' : 'show more'}
         </button>
       </div>
-      {showDetails && (
+      {visible && (
         <div>
+          <p>URL: {blog.url}</p>
           <p>Likes: {blog.likes} <button onClick={handleLike}>like</button></p>
-          <p>URL: <a href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</a></p>
+          <p>User: {blog.user.name}</p>
         </div>
       )}
     </div>
