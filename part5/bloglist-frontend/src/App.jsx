@@ -69,13 +69,6 @@ const App = () => {
     }
   }
 
-  const showNotification = (message, type) => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  }
-
   const updateBlogLikes = async (blog) => {
     const updatedBlog = {
       ...blog,
@@ -88,6 +81,23 @@ const App = () => {
     } catch (error) {
       showNotification('Error liking blog:', 'error')
     }
+  }
+
+  const deleteBlog = async (id) => {
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      showNotification('Blog removed successfully!', 'success')
+    } catch (error) {
+      showNotification('Error removing blog:', 'error')
+    }
+  }
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
@@ -133,7 +143,12 @@ const App = () => {
             <BlogForm addBlog={addBlog} />
           </Togglable>
 
-          {sortedBlogs.map(blog => <Blog key={blog.id} blog={blog} updateLikes={updateBlogLikes}/>)}
+          {sortedBlogs.map(blog => 
+            <Blog key={blog.id} 
+                  blog={blog} 
+                  updateLikes={updateBlogLikes} 
+                  deleteBlog={deleteBlog}
+            />)}
         </div>
       )}
     </div>
