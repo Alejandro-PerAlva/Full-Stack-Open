@@ -49,4 +49,31 @@ describe('Blog component', () => {
     expect(screen.getByText(`URL: ${blog.url}`)).toBeInTheDocument()
     expect(screen.getByText(`Likes: ${blog.likes}`)).toBeInTheDocument()
   })
+
+  it('calls the like event handler twice if the like button is clicked twice', async () => {
+    const blog = {
+      id: '1',
+      title: 'Testing React Components',
+      author: 'John Doe',
+      url: 'https://example.com',
+      likes: 5,
+      user: { name: 'Test User' }
+    }
+
+    const mockUpdateLikes = vi.fn()
+
+    render(<Blog blog={blog} updateLikes={mockUpdateLikes} deleteBlog={vi.fn()} />)
+
+    // Hacer clic en el botón "show more" para que se muestre el botón "like"
+    const showMoreButton = screen.getByText('show more')
+    await userEvent.click(showMoreButton)
+
+    // Hacer clic dos veces en el botón "like"
+    const likeButton = screen.getByText('like')
+    await userEvent.click(likeButton)
+    await userEvent.click(likeButton)
+
+    // Verificar que el controlador de eventos se haya llamado dos veces
+    expect(mockUpdateLikes).toHaveBeenCalledTimes(2)
+  })
 })
