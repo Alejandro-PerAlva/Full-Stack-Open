@@ -1,7 +1,7 @@
 import { useState, React } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, updateLikes, deleteBlog  }) => {
+const Blog = ({ blog, updateLikes, deleteBlog }) => {
   const [visible, setVisible] = useState(false)
 
   const toggleVisibility = () => {
@@ -19,15 +19,15 @@ const Blog = ({ blog, updateLikes, deleteBlog  }) => {
   }
 
   return (
-    <div>
-      <div>
+    <div className="blog">
+      <div className="blog-summary">
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>
           {visible ? 'show less' : 'show more'}
         </button>
       </div>
       {visible && (
-        <div>
+        <div className="blog-details">
           <p>URL: {blog.url}</p>
           <p>Likes: {blog.likes} <button onClick={handleLike}>like</button></p>
           <p>User: {blog.user.name}</p>
