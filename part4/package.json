@@ -11,7 +11,8 @@
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",
     "lint": "eslint . --ignore-pattern \"dist/*\"",
-    "lintFix": "eslint . --fix --ignore-pattern \"dist/*\""
+    "lintFix": "eslint . --fix --ignore-pattern \"dist/*\"",
+    "start:test": "cross-env NODE_ENV=test node index.js"
   },
   "author": "Alejandro Pérez Álvarez",
   "license": "ISC",
