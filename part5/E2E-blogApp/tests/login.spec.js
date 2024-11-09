@@ -39,8 +39,6 @@ describe('Blog app', () => {
       await page.fill('input[type="text"]', 'testuser')
       await page.fill('input[type="password"]', 'testpassword')
       await page.click('button[type="submit"]')
-
-      const successMessage = await page.locator('text=Logged in as Test User')
     })
 
     test('fails with wrong credentials', async ({ page }) => {
@@ -50,10 +48,27 @@ describe('Blog app', () => {
       await page.fill('input[type="password"]', 'wrongpassword')
       await page.click('button[type="submit"]')
 
-      const errorMessage = await page.locator('text=Invalid username or password')
-
       const loginForm = await page.locator('form')
       await expect(loginForm).toBeVisible()
     })
   })
+
+  describe('When logged in', () => {  
+    test('a new blog can be created', async ({ page }) => {
+
+        await page.click('button:has-text("Log in")')
+        await page.fill('input[type="text"]', 'testuser')
+        await page.fill('input[type="password"]', 'testpassword')
+        await page.click('button[type="submit"]')
+        await page.getByRole('button', { name: 'Add new blog' }).click()
+      
+        const textboxes = await page.getByRole('textbox').all()
+        await textboxes[0].fill('New Blog Title')
+        await textboxes[1].fill('Author Name')
+        await textboxes[2].fill('http://newblogurl.com')
+        
+        await page.click('button#add-blog-button:has-text("add")')
+      })
+  })
+  
 })
