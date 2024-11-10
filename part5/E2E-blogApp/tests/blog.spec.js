@@ -127,6 +127,31 @@ describe('Blog app', () => {
         // Asegurarse de que el número de likes haya incrementado
         expect(likesAfter).toBeGreaterThan(likesBefore)
       })
+
+      test('the user can delete a blog they created', async ({ page }) => {
+        // Crear un nuevo blog
+        await page.getByRole('button', { name: 'New blog' }).click()
+        const textboxes = await page.getByRole('textbox').all()
+        await textboxes[0].fill('Blog to be deleted')
+        await textboxes[1].fill('Author Name')
+        await textboxes[2].fill('http://deletethisblog.com')
+        await page.getByRole('button', { name: 'add' }).click()
+    
+        // Verificar que el nuevo blog aparece en la lista
+        await expect(page.getByText('Blog to be deleted Author Name')).toBeVisible()
+    
+        // Mostrar los detalles del blog
+        await page.getByRole('button', { name: 'show more' }).click()
+    
+        // Simular el diálogo de confirmación y aceptar
+        page.once('dialog', dialog => dialog.accept())
+    
+        // Hacer clic en el botón de eliminar
+        await page.getByRole('button', { name: 'remove' }).click()
+    
+        // Verificar que el blog ya no aparece en la lista
+        await expect(page.getByText('Blog to be deleted Author Name')).not.toBeVisible()
+      })
       
   })
 
