@@ -10,9 +10,19 @@ describe('Blog app', () => {
           name: 'Test User',
           password: 'testpassword'
         }
+
+        const otherUser = {
+          username: 'otheruser',
+          name: 'Test User',
+          password: 'otherpassword'
+        }
     
         await request.post('/api/users', {
           data: newUser
+        })
+
+        await request.post('/api/users', {
+          data: otherUser
         })
 
         await page.goto('/')
@@ -154,5 +164,62 @@ describe('Blog app', () => {
       })
       
   })
+
+  describe('When a blog exists', () => {
+    beforeEach(async ({ page, request }) => {
+      // Iniciar sesión como 'testuser' y crear un blog
+      await page.getByRole('button', { name: 'Log in' }).click()
+      const loginboxes = await page.getByRole('textbox').all()
+      await loginboxes[0].fill('testuser')
+      await loginboxes[1].fill('testpassword')
+      await page.getByRole('button', { name: 'login' }).click()
+  
+      // Crear un nuevo blog
+      await page.getByRole('button', { name: 'New blog' }).click()
+      const textboxes = await page.getByRole('textbox').all()
+      await textboxes[0].fill('Blog with restricted delete')
+      await textboxes[1].fill('Author Name')
+      await textboxes[2].fill('http://restricteddelete.com')
+      await page.getByRole('button', { name: 'add' }).click()
+  
+      // Cerrar sesión
+      await page.getByRole('button', { name: 'Logout' }).click()
+    })
+  
+    test('only the creator can see the delete button', async ({ page }) => {
+      // Iniciar sesión como otro usuario 'otheruser'
+      await page.getByRole('button', { name: 'Log in' }).click()
+      const loginboxes = await page.getByRole('textbox').all()
+      await loginboxes[0].fill('otheruser')
+      await loginboxes[1].fill('otherpassword')
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await expect(page.getByText('Blog with restricted delete Author Name')).toBeVisible()
+  
+      // Mostrar los detalles del blog
+      await page.getByRole('button', { name: 'show more' }).click()
+  
+      // Verificar que el botón de eliminar NO está visible para 'otheruser'
+      await page.getByRole('button', { name: 'remove' }).click()
+      await expect(page.getByText('Blog with restricted delete Author Name')).toBeVisible()
+      // Cerrar sesión
+      await page.getByRole('button', { name: 'Logout' }).click()
+  
+      // Iniciar sesión como el creador 'testuser'
+      await page.getByRole('button', { name: 'Log in' }).click()
+      await loginboxes[0].fill('testuser')
+      await loginboxes[1].fill('testpassword')
+      await page.getByRole('button', { name: 'login' }).click()
+  
+      // Mostrar los detalles del blog
+      page.once('dialog', dialog => dialog.accept())
+      await page.getByRole('button', { name: 'show more' }).click()
+  
+      // Verificar que el botón de eliminar SÍ está visible para 'testuser'
+      await page.getByRole('button', { name: 'remove' }).click()
+      await expect(page.getByText('Blog with restricted delete Author Name')).not.toBeVisible()
+    })
+  })
+  
 
 })
