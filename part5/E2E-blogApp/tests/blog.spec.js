@@ -102,64 +102,50 @@ describe('Blog app', () => {
       })
 
       test('a blog can be liked', async ({ page }) => {
-        // Crear un nuevo blog
+
         await page.getByRole('button', { name: 'New blog' }).click()
         const textboxes = await page.getByRole('textbox').all()
         await textboxes[0].fill('Test Blog Title')
         await textboxes[1].fill('Author Name')
         await textboxes[2].fill('http://testblogurl.com')
-        await page.getByRole('button', { name: 'add' }).click()
-      
-        // Verificar que el nuevo blog se muestra en la lista
+        await page.getByRole('button', { name: 'add' }).click()  
+
         await expect(page.getByText('Test Blog Title Author Name')).toBeVisible()
       
-        // Hacer clic en "show more" para ver los detalles del blog
         await page.getByRole('button', { name: 'show more' }).click()
       
-        // Verificar que el botón "like" esté visible
         const likeButton = await page.getByRole('button', { name: 'like' })
         await expect(likeButton).toBeVisible()
       
-        // Obtener el número de likes antes de hacer clic en "like"
         const likesBeforeText = await page.locator('p:has-text("Likes:")').textContent()
         const likesBefore = parseInt(likesBeforeText.split(': ')[1])
-      
-        // Hacer clic en el botón "like" para incrementar el contador de likes
+
         await likeButton.click()
-      
-        // Esperar un momento para asegurarnos de que la UI se actualiza
+
         await page.waitForTimeout(500)
-      
-        // Verificar que el número de likes haya aumentado
+
         const likesAfterText = await page.locator('p:has-text("Likes:")').textContent()
         const likesAfter = parseInt(likesAfterText.split(': ')[1])
-      
-        // Asegurarse de que el número de likes haya incrementado
+
         expect(likesAfter).toBeGreaterThan(likesBefore)
       })
 
       test('the user can delete a blog they created', async ({ page }) => {
-        // Crear un nuevo blog
         await page.getByRole('button', { name: 'New blog' }).click()
         const textboxes = await page.getByRole('textbox').all()
         await textboxes[0].fill('Blog to be deleted')
         await textboxes[1].fill('Author Name')
         await textboxes[2].fill('http://deletethisblog.com')
         await page.getByRole('button', { name: 'add' }).click()
-    
-        // Verificar que el nuevo blog aparece en la lista
+
         await expect(page.getByText('Blog to be deleted Author Name')).toBeVisible()
-    
-        // Mostrar los detalles del blog
+
         await page.getByRole('button', { name: 'show more' }).click()
-    
-        // Simular el diálogo de confirmación y aceptar
+
         page.once('dialog', dialog => dialog.accept())
-    
-        // Hacer clic en el botón de eliminar
+
         await page.getByRole('button', { name: 'remove' }).click()
-    
-        // Verificar que el blog ya no aparece en la lista
+
         await expect(page.getByText('Blog to be deleted Author Name')).not.toBeVisible()
       })
       
@@ -167,27 +153,23 @@ describe('Blog app', () => {
 
   describe('When a blog exists', () => {
     beforeEach(async ({ page, request }) => {
-      // Iniciar sesión como 'testuser' y crear un blog
       await page.getByRole('button', { name: 'Log in' }).click()
       const loginboxes = await page.getByRole('textbox').all()
       await loginboxes[0].fill('testuser')
       await loginboxes[1].fill('testpassword')
       await page.getByRole('button', { name: 'login' }).click()
-  
-      // Crear un nuevo blog
+
       await page.getByRole('button', { name: 'New blog' }).click()
       const textboxes = await page.getByRole('textbox').all()
       await textboxes[0].fill('Blog with restricted delete')
       await textboxes[1].fill('Author Name')
       await textboxes[2].fill('http://restricteddelete.com')
       await page.getByRole('button', { name: 'add' }).click()
-  
-      // Cerrar sesión
+
       await page.getByRole('button', { name: 'Logout' }).click()
     })
   
     test('only the creator can see the delete button', async ({ page }) => {
-      // Iniciar sesión como otro usuario 'otheruser'
       await page.getByRole('button', { name: 'Log in' }).click()
       const loginboxes = await page.getByRole('textbox').all()
       await loginboxes[0].fill('otheruser')
@@ -195,31 +177,82 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'login' }).click()
 
       await expect(page.getByText('Blog with restricted delete Author Name')).toBeVisible()
-  
-      // Mostrar los detalles del blog
+
       await page.getByRole('button', { name: 'show more' }).click()
-  
-      // Verificar que el botón de eliminar NO está visible para 'otheruser'
+
       await page.getByRole('button', { name: 'remove' }).click()
       await expect(page.getByText('Blog with restricted delete Author Name')).toBeVisible()
-      // Cerrar sesión
+
       await page.getByRole('button', { name: 'Logout' }).click()
-  
-      // Iniciar sesión como el creador 'testuser'
+
       await page.getByRole('button', { name: 'Log in' }).click()
       await loginboxes[0].fill('testuser')
       await loginboxes[1].fill('testpassword')
       await page.getByRole('button', { name: 'login' }).click()
-  
-      // Mostrar los detalles del blog
+
       page.once('dialog', dialog => dialog.accept())
       await page.getByRole('button', { name: 'show more' }).click()
-  
-      // Verificar que el botón de eliminar SÍ está visible para 'testuser'
+
       await page.getByRole('button', { name: 'remove' }).click()
       await expect(page.getByText('Blog with restricted delete Author Name')).not.toBeVisible()
     })
   })
   
+  describe('Blog order based on likes', () => {
+    beforeEach(async ({ page, request }) => {
+      await page.getByRole('button', { name: 'Log in' }).click()
+      const loginboxes = await page.getByRole('textbox').all()
+      await loginboxes[0].fill('testuser')
+      await loginboxes[1].fill('testpassword')
+      await page.getByRole('button', { name: 'login' }).click()
 
+      await page.getByRole('button', { name: 'New blog' }).click()
+      const textboxes1 = await page.getByRole('textbox').all()
+      await textboxes1[0].fill('Blog with 5 likes')
+      await textboxes1[1].fill('Author One')
+      await textboxes1[2].fill('http://blog1.com')
+      await page.getByRole('button', { name: 'add' }).click()
+      await page.getByRole('button', { name: 'show more' }).click()
+      for (let i = 0; i < 5; i++) {
+        await page.getByRole('button', { name: 'like' }).click()
+      }
+      await page.waitForTimeout(100)
+
+      await page.getByRole('button', { name: 'New blog' }).click()
+      const textboxes2 = await page.getByRole('textbox').all()
+      await textboxes2[0].fill('Blog with 10 likes')
+      await textboxes2[1].fill('Author Two')
+      await textboxes2[2].fill('http://blog2.com')
+      await page.getByRole('button', { name: 'add' }).click()
+      await page.getByRole('button', { name: 'show more' }).last().click()
+      for (let i = 0; i < 10; i++) {
+        await page.getByRole('button', { name: 'like' }).last().click()
+      }
+      await page.waitForTimeout(100)
+
+      await page.getByRole('button', { name: 'New blog' }).click()
+      const textboxes3 = await page.getByRole('textbox').all()
+      await textboxes3[0].fill('Blog with 3 likes')
+      await textboxes3[1].fill('Author Three')
+      await textboxes3[2].fill('http://blog3.com')
+      await page.getByRole('button', { name: 'add' }).click()
+      await page.getByRole('button', { name: 'show more' }).last().click()
+      for (let i = 0; i < 3; i++) {
+        await page.getByRole('button', { name: 'like' }).last().click()
+      }
+      await page.waitForTimeout(100)
+    })
+  
+    test('blogs are ordered by likes in descending order', async ({ page }) => {
+      const blogElements = await page.locator('.blog-summary').allTextContents()
+
+      expect(blogElements).toEqual([
+        'Blog with 10 likes Author Twoshow less',
+        'Blog with 5 likes Author Oneshow less',
+        'Blog with 3 likes Author Threeshow less',
+      ])
+    })
+  })
+  
+  
 })
