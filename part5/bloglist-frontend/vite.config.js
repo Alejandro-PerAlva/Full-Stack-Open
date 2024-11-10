@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://fso-exercises-p4.onrender.com",
+        target: "http://localhost:3001",
         changeOrigin: true,
       },
     },

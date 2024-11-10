@@ -126,7 +126,8 @@ const App = () => {
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
 
-          <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
+          <Togglable buttonLabel="New blog" ref={blogFormRef}>
+            <button id="add-blog-button">New blog</button>
             <BlogForm addBlog={addBlog} />
           </Togglable>
 
