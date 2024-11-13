@@ -9,32 +9,44 @@ const anecdotesAtStart = [
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
-export const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
+export const asObject = (anecdote) => ({
+  content: anecdote,
+  id: getId(),
+  votes: 0,
+})
 
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+// Action Creators
+export const voteAnecdote = (id) => ({
+  type: 'VOTE',
+  payload: id,
+})
+
+export const createAnecdote = (content) => ({
+  type: 'CREATE',
+  payload: asObject(content),
+})
+
+// Reducer
+const anecdoteReducer = (state = initialState, action) => {
+  console.log('state now:', state)
+  console.log('action:', action)
 
   switch (action.type) {
     case 'VOTE':
-      return state.map(anecdote =>
-        anecdote.id === action.payload
-          ? { ...anecdote, votes: anecdote.votes + 1 }
-          : anecdote
-      )
+      return state
+        .map(anecdote =>
+          anecdote.id === action.payload
+            ? { ...anecdote, votes: anecdote.votes + 1 }
+            : anecdote
+        )
+        .sort((a, b) => b.votes - a.votes)
     case 'CREATE':
-      return [...state, action.payload]
+      return [...state, action.payload].sort((a, b) => b.votes - a.votes)
     default:
       return state
   }
 }
 
-export default reducer
+export default anecdoteReducer
