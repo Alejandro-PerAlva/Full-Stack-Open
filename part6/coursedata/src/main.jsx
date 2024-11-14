@@ -1,15 +1,23 @@
-import { createRoot } from 'react-dom/client'
-
-import { createStore } from 'redux'
+import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 
-import './index.css'
-import App from './App.jsx'
+import { configureStore } from '@reduxjs/toolkit'
+import App from './App'
+
 import noteReducer from './reducers/noteReducer'
+import filterReducer from './reducers/filterReducer'
 
-const store = createStore(noteReducer)
 
-createRoot(document.getElementById('root')).render(
+const store = configureStore({
+  reducer: {
+    notes: noteReducer,
+    filter: filterReducer
+  }
+})
+
+console.log(store.getState())
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />
   </Provider>
