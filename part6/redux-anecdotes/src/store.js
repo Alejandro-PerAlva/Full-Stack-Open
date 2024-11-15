@@ -7,7 +7,6 @@ const store = configureStore({
     anecdotes: anecdoteReducer,
     filter: filterReducer,
   },
-  devTools: true,
 })
 
 export default store
