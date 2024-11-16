@@ -10,8 +10,8 @@ const App = () => {
   const dispatch = useDispatch()
   useEffect(() => {
     noteService
-      .getAll().then(notes => dispatch(setNotes(notes)))
-  }, [])
+      .getAll().then(notes => dispatch(setNotes))
+  })
   
   return (
     <div>
