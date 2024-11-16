@@ -1,0 +1,22 @@
+.notification {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0; /* Color de fondo por defecto */
+    color: #333; /* Color del texto */
+    z-index: 1000;
+  }
+  
+  .notification.success {
+    background-color: #d4edda; /* Color de fondo para éxito */
+    color: #155724; /* Color del texto para éxito */
+  }
+  
+  .notification.error {
+    background-color: #f8d7da; /* Color de fondo para error */
+    color: #721c24; /* Color del texto para error */
+  }
+  
