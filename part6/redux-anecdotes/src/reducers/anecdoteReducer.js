@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import anecdoteService from '../services/anecdotes'
-import { getAll } from '../services/anecdotes'
+import { getAll, createNew } from '../services/anecdotes'
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
@@ -42,7 +42,7 @@ export const initializeAnecdotes = () => {
 
 export const createAnecdote = content => {
   return async dispatch => {
-    const newAnecdote = await anecdoteService.createNew(content)
+    const newAnecdote = await createNew(content)
     dispatch(appendAnecdote(newAnecdote))
   }
 }

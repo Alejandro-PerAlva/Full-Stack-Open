@@ -1,5 +1,5 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useQuery } from '@tanstack/react-query'
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { getAll } from '../services/anecdotes'
@@ -8,7 +8,6 @@ const AnecdoteList = () => {
   const dispatch = useDispatch()
   const filter = useSelector(state => state.filter)
 
-  // Obtener anécdotas usando React Query
   const { data: anecdotes = [], isLoading, isError } = useQuery({
     queryKey: ['anecdotes'],
     queryFn: getAll,
@@ -20,7 +19,6 @@ const AnecdoteList = () => {
     dispatch(setNotification(`You voted for '${anecdote.content}'`, 5))
   }
 
-  // Filtrar anécdotas según el filtro
   const filteredAnecdotes = anecdotes.filter(anecdote =>
     anecdote.content.toLowerCase().includes(filter.toLowerCase())
   )
