@@ -1,39 +1,53 @@
-import { useQuery } from '@tanstack/react-query'
-import { useDispatch, useSelector } from 'react-redux'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getAll, updateVoteAnecdote } from '../services/anecdotes'
+import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
-import { voteAnecdote } from '../reducers/anecdoteReducer'
-import { getAll } from '../services/anecdotes'
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-  const filter = useSelector(state => state.filter)
+  const queryClient = useQueryClient()
 
-  const { data: anecdotes = [], isLoading, isError } = useQuery({
+  // Obtener anécdotas del servidor
+  const { data: anecdotes, isLoading, isError } = useQuery({
     queryKey: ['anecdotes'],
     queryFn: getAll,
     retry: 1,
   })
 
-  const vote = (anecdote) => {
-    dispatch(voteAnecdote(anecdote))
-    dispatch(setNotification(`You voted for '${anecdote.content}'`, 5))
+  // Manejar la votación de anécdotas
+  const voteMutation = useMutation({
+    mutationFn: updateVoteAnecdote,
+    onSuccess: (updatedAnecdote) => {
+      // Actualizar manualmente la caché con la anécdota actualizada
+      queryClient.setQueryData(['anecdotes'], (oldData) =>
+        oldData.map((anecdote) =>
+          anecdote.id === updatedAnecdote.id ? updatedAnecdote : anecdote
+        )
+      )
+      dispatch(setNotification(`You voted for '${updatedAnecdote.content}'`, 5))
+    },
+  })
+
+  const handleVote = (anecdote) => {
+    voteMutation.mutate(anecdote)
   }
 
-  const filteredAnecdotes = anecdotes.filter(anecdote =>
-    anecdote.content.toLowerCase().includes(filter.toLowerCase())
-  )
+  if (isLoading) {
+    return <div>Loading anecdotes...</div>
+  }
 
-  if (isLoading) return <div>Loading anecdotes...</div>
-  if (isError) return <div>Anecdote service is not available due to server issues.</div>
+  if (isError) {
+    return <div>Anecdote service is not available due to server issues</div>
+  }
 
   return (
     <div>
-      {filteredAnecdotes.map(anecdote => (
+      {anecdotes.map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div>
-            has {anecdote.votes}
-            <button onClick={() => vote(anecdote)}>vote</button>
+            has {anecdote.votes} votes
+            <button onClick={() => handleVote(anecdote)}>vote</button>
           </div>
         </div>
       ))}
