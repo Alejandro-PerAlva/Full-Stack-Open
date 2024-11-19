@@ -1,10 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getAll, updateVoteAnecdote } from '../services/anecdotes'
-import { useDispatch } from 'react-redux'
-import { setNotification } from '../reducers/notificationReducer'
+import { setNotification, useNotification } from '../context/NotificationContext'
 
 const AnecdoteList = () => {
-  const dispatch = useDispatch()
+  const { dispatch } = useNotification() // Extraer `dispatch` desde el contexto
   const queryClient = useQueryClient()
 
   // Obtener anécdotas del servidor
@@ -24,7 +23,8 @@ const AnecdoteList = () => {
           anecdote.id === updatedAnecdote.id ? updatedAnecdote : anecdote
         )
       )
-      dispatch(setNotification(`You voted for '${updatedAnecdote.content}'`, 5))
+      // Mostrar notificación
+      setNotification(dispatch, `You voted for '${updatedAnecdote.content}'`, 5) // Usar `setNotification` con `dispatch`
     },
   })
 
