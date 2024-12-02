@@ -5,23 +5,23 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { useNotification } from './contexts/NotificationContext' // Importamos el contexto de notificaciones
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
 
   const blogFormRef = useRef()
+
+  const { notification, setNotification } = useNotification() // Usamos el hook del contexto para las notificaciones
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
     const tokenTimestamp = window.localStorage.getItem('tokenTimestamp')
 
-    // Verificar si el token ha expirado (10 minutos)
     if (loggedUserJSON && tokenTimestamp) {
       const currentTime = new Date().getTime()
       if (currentTime - tokenTimestamp > 10 * 60 * 1000) {
-        // Token expirado, limpiar el usuario
         window.localStorage.removeItem('loggedUser')
         window.localStorage.removeItem('tokenTimestamp')
       } else {
@@ -39,7 +39,7 @@ const App = () => {
         const blogs = await blogService.getAll()
         setBlogs(blogs)
       } catch (error) {
-        showNotification('Error fetching blogs:', 'error')
+        setNotification('Error fetching blogs:', 'error')
       }
     }
   }
@@ -52,9 +52,9 @@ const App = () => {
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       window.localStorage.setItem('tokenTimestamp', new Date().getTime())
       await fetchBlogs(user.token)
-      showNotification('Logged in successfully!', 'success')
+      setNotification('Logged in successfully!', 'success')
     } catch (error) {
-      showNotification('Login failed', 'error')
+      setNotification('Login failed', 'error')
     }
   }
 
@@ -63,7 +63,7 @@ const App = () => {
     window.localStorage.removeItem('loggedUser')
     window.localStorage.removeItem('tokenTimestamp')
     blogService.setToken(null)
-    showNotification('Logged out successfully!', 'success')
+    setNotification('Logged out successfully!', 'success')
   }
 
   const addBlog = async (newBlog) => {
@@ -71,9 +71,9 @@ const App = () => {
       const returnedBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(returnedBlog))
       blogFormRef.current.toggleVisibility()
-      showNotification('Blog added successfully!', 'success')
+      setNotification('Blog added successfully!', 'success')
     } catch (error) {
-      showNotification('Error adding blog:', 'error')
+      setNotification('Error adding blog:', 'error')
     }
   }
 
@@ -85,9 +85,9 @@ const App = () => {
     try {
       await blogService.update(blog.id, updatedBlog)
       setBlogs(blogs.map(b => (b.id === blog.id ? updatedBlog : b)))
-      showNotification('Liked blog successfully!', 'success')
+      setNotification('Liked blog successfully!', 'success')
     } catch (error) {
-      showNotification('Error liking blog:', 'error')
+      setNotification('Error liking blog:', 'error')
     }
   }
 
@@ -95,23 +95,17 @@ const App = () => {
     try {
       await blogService.remove(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
-      showNotification('Blog removed successfully!', 'success')
+      setNotification('Blog removed successfully!', 'success')
     } catch (error) {
-      showNotification('Error removing blog:', 'error')
+      setNotification('Error removing blog:', 'error')
     }
-  }
-
-  const showNotification = (message, type) => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
   }
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
 
   return (
     <div>
+      {/* Solo muestra la notificación si existe */}
       {notification && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
