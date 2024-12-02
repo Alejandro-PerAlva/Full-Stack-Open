@@ -5,15 +5,14 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import { useNotification } from './contexts/NotificationContext' // Importamos el contexto de notificaciones
+import { useNotification } from './contexts/NotificationContext'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-
   const blogFormRef = useRef()
-
-  const { notification, setNotification } = useNotification() // Usamos el hook del contexto para las notificaciones
+  const { notification, setNotification } = useNotification()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
@@ -28,22 +27,56 @@ const App = () => {
         const user = JSON.parse(loggedUserJSON)
         setUser(user)
         blogService.setToken(user.token)
-        fetchBlogs(user.token)
       }
     }
   }, [])
 
-  const fetchBlogs = async (token) => {
-    if (token) {
-      try {
-        const blogs = await blogService.getAll()
-        setBlogs(blogs)
-      } catch (error) {
-        setNotification('Error fetching blogs:', 'error')
-      }
-    }
-  }
+  // Función para obtener blogs
+  const { data: blogs, isLoading } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+  })
 
+  // Mutación para crear un blog
+  const createBlogMutation = useMutation({
+    mutationFn: (newBlog) => blogService.create(newBlog),
+    onSuccess: (newBlog) => {
+      queryClient.setQueryData(['blogs'], (oldBlogs) => [...oldBlogs, newBlog])
+      blogFormRef.current.toggleVisibility()
+      setNotification('Blog added successfully!', 'success')
+    },
+    onError: () => {
+      setNotification('Error adding blog', 'error')
+    },
+  })
+
+  // Mutación para actualizar los likes de un blog
+  const updateLikesMutation = useMutation({
+    mutationFn: (blog) => blogService.update(blog.id, { ...blog, likes: blog.likes + 1 }),
+    onSuccess: (updatedBlog) => {
+      queryClient.setQueryData(['blogs'], (oldBlogs) =>
+        oldBlogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b))
+      )
+      setNotification('Liked blog successfully!', 'success')
+    },
+    onError: () => {
+      setNotification('Error liking blog', 'error')
+    },
+  })
+
+  // Mutación para eliminar un blog
+  const deleteBlogMutation = useMutation({
+    mutationFn: (id) => blogService.remove(id),
+    onSuccess: (id) => {
+      queryClient.setQueryData(['blogs'], (oldBlogs) => oldBlogs.filter((blog) => blog.id !== id))
+      setNotification('Blog removed successfully!', 'success')
+    },
+    onError: () => {
+      setNotification('Error removing blog', 'error')
+    },
+  })
+
+  // Función de inicio de sesión
   const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({ username, password })
@@ -51,13 +84,13 @@ const App = () => {
       setUser(user)
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       window.localStorage.setItem('tokenTimestamp', new Date().getTime())
-      await fetchBlogs(user.token)
       setNotification('Logged in successfully!', 'success')
     } catch (error) {
       setNotification('Login failed', 'error')
     }
   }
 
+  // Función de cierre de sesión
   const handleLogout = () => {
     setUser(null)
     window.localStorage.removeItem('loggedUser')
@@ -66,46 +99,23 @@ const App = () => {
     setNotification('Logged out successfully!', 'success')
   }
 
-  const addBlog = async (newBlog) => {
-    try {
-      const returnedBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(returnedBlog))
-      blogFormRef.current.toggleVisibility()
-      setNotification('Blog added successfully!', 'success')
-    } catch (error) {
-      setNotification('Error adding blog:', 'error')
-    }
+  // Funciones para manejar los blogs
+  const addBlog = (newBlog) => {
+    createBlogMutation.mutate(newBlog)
   }
 
-  const updateBlogLikes = async (blog) => {
-    const updatedBlog = {
-      ...blog,
-      likes: blog.likes + 1
-    }
-    try {
-      await blogService.update(blog.id, updatedBlog)
-      setBlogs(blogs.map(b => (b.id === blog.id ? updatedBlog : b)))
-      setNotification('Liked blog successfully!', 'success')
-    } catch (error) {
-      setNotification('Error liking blog:', 'error')
-    }
+  const updateBlogLikes = (blog) => {
+    updateLikesMutation.mutate(blog)
   }
 
-  const deleteBlog = async (id) => {
-    try {
-      await blogService.remove(id)
-      setBlogs(blogs.filter(blog => blog.id !== id))
-      setNotification('Blog removed successfully!', 'success')
-    } catch (error) {
-      setNotification('Error removing blog:', 'error')
-    }
+  const deleteBlog = (id) => {
+    deleteBlogMutation.mutate(id)
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  if (isLoading) return <div>Loading...</div>
 
   return (
     <div>
-      {/* Solo muestra la notificación si existe */}
       {notification && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -125,7 +135,7 @@ const App = () => {
             <BlogForm addBlog={addBlog} />
           </Togglable>
 
-          {sortedBlogs.map(blog =>
+          {blogs && blogs.map(blog =>
             <Blog key={blog.id}
                   blog={blog}
                   updateLikes={updateBlogLikes}
