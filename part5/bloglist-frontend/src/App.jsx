@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, React } from 'react'
+import { useEffect, useRef, React } from 'react'
 import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
@@ -7,12 +7,13 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import { useNotification } from './contexts/NotificationContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useUser } from './contexts/UserContext'
 
 const App = () => {
-  const [user, setUser] = useState(null)
   const blogFormRef = useRef()
   const { notification, setNotification } = useNotification()
   const queryClient = useQueryClient()
+  const { state, dispatch } = useUser()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
@@ -25,19 +26,20 @@ const App = () => {
         window.localStorage.removeItem('tokenTimestamp')
       } else {
         const user = JSON.parse(loggedUserJSON)
-        setUser(user)
+        dispatch({
+          type: 'SET_USER',
+          payload: { user, tokenTimestamp: new Date().getTime() },
+        })
         blogService.setToken(user.token)
       }
     }
-  }, [])
+  }, [dispatch])
 
-  // Función para obtener blogs
   const { data: blogs, isLoading } = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
   })
 
-  // Mutación para crear un blog
   const createBlogMutation = useMutation({
     mutationFn: (newBlog) => blogService.create(newBlog),
     onSuccess: (newBlog) => {
@@ -50,7 +52,6 @@ const App = () => {
     },
   })
 
-  // Mutación para actualizar los likes de un blog
   const updateLikesMutation = useMutation({
     mutationFn: (blog) => blogService.update(blog.id, { ...blog, likes: blog.likes + 1 }),
     onSuccess: (updatedBlog) => {
@@ -64,7 +65,6 @@ const App = () => {
     },
   })
 
-  // Mutación para eliminar un blog
   const deleteBlogMutation = useMutation({
     mutationFn: (id) => blogService.remove(id),
     onSuccess: (id) => {
@@ -76,12 +76,14 @@ const App = () => {
     },
   })
 
-  // Función de inicio de sesión
   const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({ username, password })
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch({
+        type: 'SET_USER',
+        payload: { user, tokenTimestamp: new Date().getTime() },
+      })
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       window.localStorage.setItem('tokenTimestamp', new Date().getTime())
       setNotification('Logged in successfully!', 'success')
@@ -90,16 +92,14 @@ const App = () => {
     }
   }
 
-  // Función de cierre de sesión
   const handleLogout = () => {
-    setUser(null)
+    dispatch({ type: 'LOGOUT' })
     window.localStorage.removeItem('loggedUser')
     window.localStorage.removeItem('tokenTimestamp')
     blogService.setToken(null)
     setNotification('Logged out successfully!', 'success')
   }
 
-  // Funciones para manejar los blogs
   const addBlog = (newBlog) => {
     createBlogMutation.mutate(newBlog)
   }
@@ -122,12 +122,12 @@ const App = () => {
         </div>
       )}
 
-      {user === null ? (
+      {state.user === null ? (
         <LoginForm handleLogin={handleLogin} />
       ) : (
         <div>
           <h2>blogs</h2>
-          <p>{user.name} logged in</p>
+          <p>{state.user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
 
           <Togglable buttonLabel="New blog" ref={blogFormRef}>
