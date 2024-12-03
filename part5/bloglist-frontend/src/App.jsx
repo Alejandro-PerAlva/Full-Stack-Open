@@ -1,9 +1,11 @@
 import { useEffect, useRef, React, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import UserList from './components/UserList'
+import UserDetail from './components/UserDetail'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { useNotification } from './contexts/NotificationContext'
@@ -15,7 +17,6 @@ const App = () => {
   const { notification, setNotification } = useNotification()
   const queryClient = useQueryClient()
   const { state, dispatch } = useUser()
-  const [view, setView] = useState('blogs') // 'blogs' or 'users'
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
@@ -89,46 +90,51 @@ const App = () => {
   if (loadingBlogs || loadingUsers) return <div>Loading...</div>
 
   return (
-    <div>
-      {notification && (
-        <div className={`notification ${notification.type}`}>
-          {notification.message}
-        </div>
-      )}
+    <Router>
+      <div>
+        {notification && (
+          <div className={`notification ${notification.type}`}>
+            {notification.message}
+          </div>
+        )}
 
-      {state.user === null ? (
-        <LoginForm handleLogin={handleLogin} />
-      ) : (
-        <div>
-          <h2>blogs</h2>
-          <p>{state.user.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
+        {state.user === null ? (
+          <LoginForm handleLogin={handleLogin} />
+        ) : (
+          <div>
+            <h2>blogs</h2>
+            <p>{state.user.name} logged in</p>
+            <button onClick={handleLogout}>logout</button>
+            <Link to="/">Blogs</Link> | <Link to="/users">Users</Link>
 
-          <button onClick={() => setView('blogs')}>View Blogs</button>
-          <button onClick={() => setView('users')}>View Users</button>
-
-          {view === 'blogs' ? (
-            <>
-              <Togglable buttonLabel="New blog" ref={blogFormRef}>
-                <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
-              </Togglable>
-              {blogs.map((blog) => (
-                <Blog
-                  key={blog.id}
-                  blog={blog}
-                  updateLikes={(updatedBlog) =>
-                    blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
-                  }
-                  deleteBlog={(id) => blogService.remove(id)}
-                />
-              ))}
-            </>
-          ) : (
-            <UserList users={users} />
-          )}
-        </div>
-      )}
-    </div>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Togglable buttonLabel="New blog" ref={blogFormRef}>
+                      <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
+                    </Togglable>
+                    {blogs.map((blog) => (
+                      <Blog
+                        key={blog.id}
+                        blog={blog}
+                        updateLikes={(updatedBlog) =>
+                          blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
+                        }
+                        deleteBlog={(id) => blogService.remove(id)}
+                      />
+                    ))}
+                  </>
+                }
+              />
+              <Route path="/users" element={<UserList users={users} />} />
+              <Route path="/users/:id" element={<UserDetail users={users} />} />
+            </Routes>
+          </div>
+        )}
+      </div>
+    </Router>
   )
 }
 
