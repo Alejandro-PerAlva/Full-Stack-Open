@@ -1,6 +1,7 @@
-import { useEffect, useRef, React, useState } from 'react'
+import { useEffect, useRef, React } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Blog from './components/Blog'
+import BlogDetail from './components/BlogDetail' // Importar el nuevo componente para los detalles del blog
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
@@ -115,19 +116,24 @@ const App = () => {
                     <Togglable buttonLabel="New blog" ref={blogFormRef}>
                       <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
                     </Togglable>
-                    {blogs.map((blog) => (
-                      <Blog
-                        key={blog.id}
-                        blog={blog}
-                        updateLikes={(updatedBlog) =>
-                          blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
-                        }
-                        deleteBlog={(id) => blogService.remove(id)}
-                      />
-                    ))}
+                    {blogs && blogs.length > 0 ? (
+                      blogs.map((blog) => (
+                        <Blog
+                          key={blog.id}
+                          blog={blog}
+                          updateLikes={(updatedBlog) =>
+                            blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
+                          }
+                          deleteBlog={(id) => blogService.remove(id)}
+                        />
+                      ))
+                    ) : (
+                      <p>No blogs available</p>
+                    )}
                   </>
                 }
               />
+              <Route path="/blogs/:id" element={<BlogDetail />} /> {/* Ruta para los detalles del blog */}
               <Route path="/users" element={<UserList users={users} />} />
               <Route path="/users/:id" element={<UserDetail users={users} />} />
             </Routes>
