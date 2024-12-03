@@ -1,7 +1,8 @@
-import { useEffect, useRef, React } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+/* eslint-disable react/react-in-jsx-scope */
+import { useEffect, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Blog from './components/Blog'
-import BlogDetail from './components/BlogDetail' // Importar el nuevo componente para los detalles del blog
+import BlogDetail from './components/BlogDetail'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
@@ -12,6 +13,7 @@ import loginService from './services/login'
 import { useNotification } from './contexts/NotificationContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useUser } from './contexts/UserContext'
+import NavBar from './components/NavBar'
 
 const App = () => {
   const blogFormRef = useRef()
@@ -106,13 +108,12 @@ const App = () => {
             <h2>blogs</h2>
             <p>{state.user.name} logged in</p>
             <button onClick={handleLogout}>logout</button>
-            <Link to="/">Blogs</Link> | <Link to="/users">Users</Link>
-
+            <NavBar user={state.user} />
             <Routes>
               <Route
-                path="/"
+                path="/blogs"
                 element={
-                  <>
+                  <div>
                     <Togglable buttonLabel="New blog" ref={blogFormRef}>
                       <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
                     </Togglable>
@@ -130,12 +131,15 @@ const App = () => {
                     ) : (
                       <p>No blogs available</p>
                     )}
-                  </>
+                  </div>
                 }
               />
-              <Route path="/blogs/:id" element={<BlogDetail />} /> {/* Ruta para los detalles del blog */}
+              <Route path="/blogs/:id" element={<BlogDetail />} />
               <Route path="/users" element={<UserList users={users} />} />
-              <Route path="/users/:id" element={<UserDetail users={users} />} />
+              <Route
+                path="/users/:id"
+                element={<UserDetail users={users} />}
+              />
             </Routes>
           </div>
         )}

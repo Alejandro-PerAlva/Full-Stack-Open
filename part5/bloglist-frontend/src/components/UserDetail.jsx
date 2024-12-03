@@ -1,5 +1,5 @@
-/* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable react/prop-types */
+/* eslint-disable react/react-in-jsx-scope */
 import { useParams } from 'react-router-dom'
 
 const UserDetail = ({ users }) => {
