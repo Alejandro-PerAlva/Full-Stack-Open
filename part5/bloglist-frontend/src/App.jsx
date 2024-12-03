@@ -1,8 +1,9 @@
-import { useEffect, useRef, React } from 'react'
+import { useEffect, useRef, React, useState } from 'react'
 import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import UserList from './components/UserList'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { useNotification } from './contexts/NotificationContext'
@@ -14,6 +15,7 @@ const App = () => {
   const { notification, setNotification } = useNotification()
   const queryClient = useQueryClient()
   const { state, dispatch } = useUser()
+  const [view, setView] = useState('blogs') // 'blogs' or 'users'
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
@@ -35,9 +37,17 @@ const App = () => {
     }
   }, [dispatch])
 
-  const { data: blogs, isLoading } = useQuery({
+  const { data: blogs, isLoading: loadingBlogs } = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
+  })
+
+  const { data: users, isLoading: loadingUsers } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await fetch('/api/users')
+      return response.json()
+    },
   })
 
   const createBlogMutation = useMutation({
@@ -49,30 +59,6 @@ const App = () => {
     },
     onError: () => {
       setNotification('Error adding blog', 'error')
-    },
-  })
-
-  const updateLikesMutation = useMutation({
-    mutationFn: (blog) => blogService.update(blog.id, { ...blog, likes: blog.likes + 1 }),
-    onSuccess: (updatedBlog) => {
-      queryClient.setQueryData(['blogs'], (oldBlogs) =>
-        oldBlogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b))
-      )
-      setNotification('Liked blog successfully!', 'success')
-    },
-    onError: () => {
-      setNotification('Error liking blog', 'error')
-    },
-  })
-
-  const deleteBlogMutation = useMutation({
-    mutationFn: (id) => blogService.remove(id),
-    onSuccess: (id) => {
-      queryClient.setQueryData(['blogs'], (oldBlogs) => oldBlogs.filter((blog) => blog.id !== id))
-      setNotification('Blog removed successfully!', 'success')
-    },
-    onError: () => {
-      setNotification('Error removing blog', 'error')
     },
   })
 
@@ -100,19 +86,7 @@ const App = () => {
     setNotification('Logged out successfully!', 'success')
   }
 
-  const addBlog = (newBlog) => {
-    createBlogMutation.mutate(newBlog)
-  }
-
-  const updateBlogLikes = (blog) => {
-    updateLikesMutation.mutate(blog)
-  }
-
-  const deleteBlog = (id) => {
-    deleteBlogMutation.mutate(id)
-  }
-
-  if (isLoading) return <div>Loading...</div>
+  if (loadingBlogs || loadingUsers) return <div>Loading...</div>
 
   return (
     <div>
@@ -130,17 +104,28 @@ const App = () => {
           <p>{state.user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
 
-          <Togglable buttonLabel="New blog" ref={blogFormRef}>
-            <button id="add-blog-button">New blog</button>
-            <BlogForm addBlog={addBlog} />
-          </Togglable>
+          <button onClick={() => setView('blogs')}>View Blogs</button>
+          <button onClick={() => setView('users')}>View Users</button>
 
-          {blogs && blogs.map(blog =>
-            <Blog key={blog.id}
+          {view === 'blogs' ? (
+            <>
+              <Togglable buttonLabel="New blog" ref={blogFormRef}>
+                <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
+              </Togglable>
+              {blogs.map((blog) => (
+                <Blog
+                  key={blog.id}
                   blog={blog}
-                  updateLikes={updateBlogLikes}
-                  deleteBlog={deleteBlog}
-            />)}
+                  updateLikes={(updatedBlog) =>
+                    blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
+                  }
+                  deleteBlog={(id) => blogService.remove(id)}
+                />
+              ))}
+            </>
+          ) : (
+            <UserList users={users} />
+          )}
         </div>
       )}
     </div>
