@@ -1,23 +1,21 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom'
 
 const NavBar = ({ user }) => {
   return (
-    <nav>
-      <ul style={{ display: 'flex', listStyleType: 'none', margin: 0, padding: 0 }}>
-        <li style={{ margin: '0 15px' }}>
-          <Link to="/blogs">Blogs</Link>
-        </li>
-        <li style={{ margin: '0 15px' }}>
-          <Link to="/users">Users</Link>
-        </li>
-        {user && (
-          <li style={{ margin: '0 15px' }}>
-            <Link to={`/users/${user.id}`}>Profile</Link>
-          </li>
+    <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f0f0f0' }}>
+      <div>
+        <Link style={{ margin: '0 15px' }} to="/blogs">Blogs</Link>
+        <Link style={{ margin: '0 15px' }} to="/users">Users</Link>
+      </div>
+      <div>
+        {user && user.name ? (
+          <Link style={{ margin: '0 15px' }} to="/profile">{user.name}</Link>
+        ) : (
+          <Link style={{ margin: '0 15px' }} to="/login">Login</Link>
         )}
-      </ul>
+      </div>
     </nav>
   )
 }

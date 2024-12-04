@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useEffect, useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Blog from './components/Blog'
 import BlogDetail from './components/BlogDetail'
 import Togglable from './components/Togglable'
@@ -8,6 +8,7 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import UserList from './components/UserList'
 import UserDetail from './components/UserDetail'
+import UserProfile from './components/UserProfile'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { useNotification } from './contexts/NotificationContext'
@@ -20,7 +21,9 @@ const App = () => {
   const { notification, setNotification } = useNotification()
   const queryClient = useQueryClient()
   const { state, dispatch } = useUser()
+  const [loading, setLoading] = useState(true) // Estado de carga
 
+  // Comprobar si el usuario ya está autenticado
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
     const tokenTimestamp = window.localStorage.getItem('tokenTimestamp')
@@ -28,19 +31,26 @@ const App = () => {
     if (loggedUserJSON && tokenTimestamp) {
       const currentTime = new Date().getTime()
       if (currentTime - tokenTimestamp > 10 * 60 * 1000) {
+        // Si el token ha caducado, eliminamos el usuario de localStorage
         window.localStorage.removeItem('loggedUser')
         window.localStorage.removeItem('tokenTimestamp')
+        setLoading(false)
       } else {
+        // Si el token es válido, cargamos el usuario
         const user = JSON.parse(loggedUserJSON)
         dispatch({
           type: 'SET_USER',
           payload: { user, tokenTimestamp: new Date().getTime() },
         })
         blogService.setToken(user.token)
+        setLoading(false)
       }
+    } else {
+      setLoading(false)
     }
   }, [dispatch])
 
+  // Cargar blogs y usuarios
   const { data: blogs, isLoading: loadingBlogs } = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
@@ -54,6 +64,7 @@ const App = () => {
     },
   })
 
+  // Mutación para crear blogs
   const createBlogMutation = useMutation({
     mutationFn: (newBlog) => blogService.create(newBlog),
     onSuccess: (newBlog) => {
@@ -66,6 +77,7 @@ const App = () => {
     },
   })
 
+  // Manejo del login
   const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({ username, password })
@@ -77,11 +89,18 @@ const App = () => {
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       window.localStorage.setItem('tokenTimestamp', new Date().getTime())
       setNotification('Logged in successfully!', 'success')
+
+      // Esperar 1 segundo antes de redirigir y recargar
+      setTimeout(() => {
+        window.location.reload()
+        window.location.href = '/profile'
+      })
     } catch (error) {
       setNotification('Login failed', 'error')
     }
   }
 
+  // Manejo del logout
   const handleLogout = () => {
     dispatch({ type: 'LOGOUT' })
     window.localStorage.removeItem('loggedUser')
@@ -90,7 +109,8 @@ const App = () => {
     setNotification('Logged out successfully!', 'success')
   }
 
-  if (loadingBlogs || loadingUsers) return <div>Loading...</div>
+  // No renderizar nada mientras los datos están siendo cargados
+  if (loading || loadingBlogs || loadingUsers) return <div>Loading...</div>
 
   return (
     <Router>
@@ -101,48 +121,59 @@ const App = () => {
           </div>
         )}
 
-        {state.user === null ? (
-          <LoginForm handleLogin={handleLogin} />
-        ) : (
-          <div>
-            <h2>blogs</h2>
-            <p>{state.user.name} logged in</p>
-            <button onClick={handleLogout}>logout</button>
-            <NavBar user={state.user} />
-            <Routes>
-              <Route
-                path="/blogs"
-                element={
-                  <div>
-                    <Togglable buttonLabel="New blog" ref={blogFormRef}>
-                      <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
-                    </Togglable>
-                    {blogs && blogs.length > 0 ? (
-                      blogs.map((blog) => (
-                        <Blog
-                          key={blog.id}
-                          blog={blog}
-                          updateLikes={(updatedBlog) =>
-                            blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
-                          }
-                          deleteBlog={(id) => blogService.remove(id)}
-                        />
-                      ))
-                    ) : (
-                      <p>No blogs available</p>
-                    )}
-                  </div>
-                }
-              />
-              <Route path="/blogs/:id" element={<BlogDetail />} />
-              <Route path="/users" element={<UserList users={users} />} />
-              <Route
-                path="/users/:id"
-                element={<UserDetail users={users} />}
-              />
-            </Routes>
-          </div>
-        )}
+        <NavBar user={state.user} />
+        <Routes>
+          <Route
+            path="/blogs"
+            element={
+              <div>
+                <h2>Blogs</h2>
+                {state.user && (
+                  <Togglable buttonLabel="New blog" ref={blogFormRef}>
+                    <BlogForm addBlog={(newBlog) => createBlogMutation.mutate(newBlog)} />
+                  </Togglable>
+                )}
+                {blogs && blogs.length > 0 ? (
+                  blogs.map((blog) => (
+                    <Blog
+                      key={blog.id}
+                      blog={blog}
+                      updateLikes={(updatedBlog) =>
+                        blogService.update(updatedBlog.id, { ...updatedBlog, likes: updatedBlog.likes + 1 })
+                      }
+                      deleteBlog={(id) => blogService.remove(id)}
+                    />
+                  ))
+                ) : (
+                  <p>No blogs available</p>
+                )}
+              </div>
+            }
+          />
+          <Route path="/blogs/:id" element={<BlogDetail />} />
+          <Route path="/users" element={<UserList users={users} />} />
+          <Route
+            path="/users/:id"
+            element={
+              state.user ? <UserDetail users={users} /> : <Navigate replace to="/login" />
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              state.user ? (
+                <UserProfile user={state.user} handleLogout={handleLogout} />
+              ) : (
+                <Navigate replace to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/login"
+            element={<LoginForm handleLogin={handleLogin} />}
+          />
+          <Route path="/" element={<Navigate replace to="/blogs" />} />
+        </Routes>
       </div>
     </Router>
   )
