@@ -7,6 +7,7 @@ import { useUser } from '../contexts/UserContext' // Importar el contexto del us
 const BlogDetail = () => {
   const { id } = useParams()
   const [blog, setBlog] = useState(null)
+  const [newComment, setNewComment] = useState('') // Estado para el nuevo comentario
   const navigate = useNavigate()
   const { state: userState } = useUser() // Obtener el usuario desde el contexto global
   const [canDelete, setCanDelete] = useState(false) // Estado independiente para ver si se puede eliminar
@@ -51,6 +52,17 @@ const BlogDetail = () => {
     }
   }
 
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return
+    try {
+      const updatedBlog = await blogService.addComment(blog.id, newComment)
+      setBlog(updatedBlog)
+      setNewComment('') // Limpiar el campo de comentario
+    } catch (error) {
+      console.error('Error adding comment:', error)
+    }
+  }
+
   // Verificar si el blog aún no ha sido cargado
   if (!blog) {
     return <div>Loading...</div>
@@ -68,6 +80,25 @@ const BlogDetail = () => {
       {canDelete && (
         <button onClick={handleDelete}>Delete</button>
       )}
+
+      <h3>Comments</h3>
+      <ul>
+        {blog.comments && blog.comments.length > 0 ? (
+          blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
+        ) : (
+          <p>No comments yet.</p>
+        )}
+      </ul>
+
+      <div>
+        <input
+          type="text"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add a comment"
+        />
+        <button onClick={handleAddComment}>Add Comment</button>
+      </div>
     </div>
   )
 }
