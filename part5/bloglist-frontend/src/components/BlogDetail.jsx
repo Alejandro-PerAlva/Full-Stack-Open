@@ -69,35 +69,37 @@ const BlogDetail = () => {
   }
 
   return (
-    <div>
+    <div className="blog-detail">
       <h2>{blog.title}</h2>
       <p>Author: {blog.author}</p>
-      <p>URL: <a href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</a></p>
+      <p>
+        URL:{" "}
+        <a href={blog.url} target="_blank" rel="noopener noreferrer">
+          {blog.url}
+        </a>
+      </p>
       <p>Likes: {blog.likes}</p>
       <button onClick={handleLike}>Like</button>
-      <p>User: {blog.user ? blog.user.name : 'Unknown user'}</p>
-      {/* Mostrar el botón de eliminar solo si el usuario es el creador del blog */}
-      {canDelete && (
-        <button onClick={handleDelete}>Delete</button>
-      )}
-
-      <h3>Comments</h3>
-      <ul>
-        {blog.comments && blog.comments.length > 0 ? (
-          blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
-        ) : (
-          <p>No comments yet.</p>
-        )}
-      </ul>
-
-      <div>
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment"
-        />
-        <button onClick={handleAddComment}>Add Comment</button>
+      <p>User: {blog.user ? blog.user.name : "Unknown user"}</p>
+      {canDelete && <button onClick={handleDelete}>Delete</button>}
+      <div className="comments">
+        <h3>Comments</h3>
+        <ul>
+          {blog.comments && blog.comments.length > 0 ? (
+            blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
+          ) : (
+            <p>No comments yet.</p>
+          )}
+        </ul>
+        <div className="comment-input">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment"
+          />
+          <button onClick={handleAddComment}>Add Comment</button>
+        </div>
       </div>
     </div>
   )

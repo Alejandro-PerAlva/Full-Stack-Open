@@ -1,22 +1,616 @@
 .notification {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f0f0f0; /* Color de fondo por defecto */
-    color: #333; /* Color del texto */
-    z-index: 1000;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f9f9f9; /* Fondo neutro elegante */
+  color: #333; /* Texto oscuro */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.notification.success {
+  background-color: #e9f8ed; /* Fondo verde suave */
+  color: #276749; /* Texto verde oscuro */
+  border-left: 4px solid #38a169; /* Indicador visual */
+}
+
+.notification.error {
+  background-color: #fde9eb; /* Fondo rojo suave */
+  color: #9b2c2c; /* Texto rojo oscuro */
+  border-left: 4px solid #e53e3e; /* Indicador visual */
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
   }
-  
-  .notification.success {
-    background-color: #d4edda; /* Color de fondo para éxito */
-    color: #155724; /* Color del texto para éxito */
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
-  
-  .notification.error {
-    background-color: #f8d7da; /* Color de fondo para error */
-    color: #721c24; /* Color del texto para error */
+}
+
+.blog {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0; /* Borde sutil */
+  border-radius: 8px; /* Bordes redondeados */
+  background-color: #fff; /* Fondo blanco limpio */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra ligera */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Animaciones suaves */
+}
+
+.blog a {
+  text-decoration: none;
+  color: #2c5282; /* Azul elegante */
+  font-size: 16px; /* Tamaño de fuente moderado */
+  font-weight: 600; /* Texto semi-negrita */
+}
+
+.blog:hover {
+  transform: translateY(-2px); /* Efecto flotante */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más intensa */
+}
+
+.blog a:hover {
+  color: #2b6cb0; /* Azul ligeramente más oscuro al pasar el cursor */
+}
+
+/* Contenedor principal */
+.blog-detail {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Título del blog */
+.blog-detail h2 {
+  font-size: 28px;
+  color: #2c5282;
+  margin-bottom: 10px;
+}
+
+/* Información del blog */
+.blog-detail p {
+  font-size: 16px;
+  margin: 5px 0;
+  color: #4a5568;
+}
+
+.blog-detail a {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.blog-detail a:hover {
+  text-decoration: underline;
+}
+
+/* Botones */
+.blog-detail button {
+  padding: 8px 12px;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.blog-detail button:hover {
+  background-color: #2b6cb0;
+}
+
+.blog-detail button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+/* Lista de comentarios */
+.comments {
+  margin-top: 20px;
+}
+
+.comments h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #2d3748;
+}
+
+.comments ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.comments li {
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f7fafc;
+}
+
+/* Input y botón de comentarios */
+.comment-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.comment-input button {
+  padding: 10px 15px;
+}
+
+/* Contenedor del formulario */
+.blog-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilo de las etiquetas */
+.blog-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+
+/* Contenedor de cada campo */
+.blog-form div {
+  margin-bottom: 15px;
+}
+
+/* Estilo de los inputs */
+.blog-form input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Estilo del botón */
+.blog-form button {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.blog-form button:hover {
+  background-color: #2b6cb0;
+}
+
+/* Contenedor del formulario */
+.login-form {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Contenedor de los campos del formulario */
+.login-form div {
+  margin-bottom: 15px;
+}
+
+/* Etiquetas de los inputs */
+.login-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+
+/* Estilo de los inputs */
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Estilo del botón */
+.login-form button {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #2b6cb0;
+}
+
+/* Contenedor principal */
+.togglable-container {
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Botones */
+.togglable-button {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px 0;
+}
+
+.togglable-button:hover {
+  background-color: #2b6cb0;
+}
+
+.togglable-cancel-button {
+  background-color: #e53e3e;
+}
+
+.togglable-cancel-button:hover {
+  background-color: #c53030;
+}
+
+/* Estilo general del contenedor */
+.user-detail-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+.user-detail-container h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.user-detail-container h3 {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* Lista de blogs */
+.user-detail-container ul {
+  padding-left: 20px;
+}
+
+.user-detail-container li {
+  font-size: 16px;
+  color: #3182ce;
+  margin-bottom: 8px;
+  transition: color 0.3s ease;
+}
+
+.user-detail-container li:hover {
+  color: #2b6cb0;
+}
+
+/* Estilo general del contenedor */
+.user-list-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de la lista de usuarios */
+.user-list-container h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Tabla */
+.user-list-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.user-list-container th,
+.user-list-container td {
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Enlaces */
+.user-list-container a {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.user-list-container a:hover {
+  color: #2b6cb0;
+  text-decoration: underline;
+}
+
+/* Fila de la tabla */
+.user-list-container tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Estilo general del contenedor */
+.user-profile-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal */
+.user-profile-container h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Información del usuario */
+.user-profile-container p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Subtítulo de los blogs */
+.user-profile-container h3 {
+  font-size: 20px;
+  color: #333;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Lista de blogs */
+.user-profile-container ul {
+  padding-left: 20px;
+}
+
+.user-profile-container li {
+  font-size: 16px;
+  color: #555;
+}
+
+/* Mensaje si no hay blogs */
+.user-profile-container p {
+  color: #999;
+}
+
+/* Botón de logout */
+.user-profile-container button {
+  background-color: #3182ce;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.user-profile-container button:hover {
+  background-color: #2b6cb0;
+}
+
+/* Estilo del contenedor del NavBar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+
+/* Estilo para los enlaces */
+.navbar a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #3182ce;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+/* Cambio de color en hover */
+.navbar a:hover {
+  color: #2b6cb0;
+}
+
+/* Estilo para el contenedor de enlaces */
+.navbar div {
+  display: flex;
+  align-items: center;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f9f9f9;
+  color: #333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.notification.success {
+  background-color: #e9f8ed;
+  color: #276749;
+  border-left: 4px solid #38a169;
+}
+
+.notification.error {
+  background-color: #fde9eb;
+  color: #9b2c2c;
+  border-left: 4px solid #e53e3e;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
   }
-  
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #2c5282;
+}
+
+p {
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.togglable-container {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.togglable-button {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px 0;
+}
+
+.togglable-button:hover {
+  background-color: #2b6cb0;
+}
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blog-list .blog {
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-list .blog:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-list .blog a {
+  text-decoration: none;
+  color: #2c5282;
+  font-weight: 600;
+}
+
+.blog-list .blog a:hover {
+  color: #2b6cb0;
+}
+
+.blog-list .no-blogs {
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.blog-detail-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.blog-detail-container h2 {
+  font-size: 28px;
+  color: #2c5282;
+  margin-bottom: 15px;
+}
+
+.blog-detail-container p {
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.blog-detail-container a {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.blog-detail-container a:hover {
+  text-decoration: underline;
+}

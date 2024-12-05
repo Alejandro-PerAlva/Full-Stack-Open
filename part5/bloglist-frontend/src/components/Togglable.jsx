@@ -4,28 +4,35 @@ import PropTypes from 'prop-types'
 const Togglable = forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false)
 
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
   const toggleVisibility = () => {
     setVisible(!visible)
   }
 
-  useImperativeHandle(ref, () => {
-    return {
-      toggleVisibility
-    }
-  })
+  useImperativeHandle(ref, () => ({
+    toggleVisibility
+  }))
 
   return (
-    <div>
-      <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
-      </div>
-      <div style={showWhenVisible}>
-        {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
-      </div>
+    <div className="togglable-container">
+      {!visible && (
+        <button
+          className="togglable-button"
+          onClick={toggleVisibility}
+        >
+          {props.buttonLabel}
+        </button>
+      )}
+      {visible && (
+        <div>
+          {props.children}
+          <button
+            className="togglable-button togglable-cancel-button"
+            onClick={toggleVisibility}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   )
 })

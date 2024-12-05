@@ -4,16 +4,16 @@ import { Link } from 'react-router-dom'
 
 const NavBar = ({ user }) => {
   return (
-    <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f0f0f0' }}>
+    <nav className="navbar">
       <div>
-        <Link style={{ margin: '0 15px' }} to="/blogs">Blogs</Link>
-        <Link style={{ margin: '0 15px' }} to="/users">Users</Link>
+        <Link to="/blogs">Blogs</Link>
+        <Link to="/users">Users</Link>
       </div>
       <div>
         {user && user.name ? (
-          <Link style={{ margin: '0 15px' }} to="/profile">{user.name}</Link>
+          <Link to="/profile">{user.name}</Link>
         ) : (
-          <Link style={{ margin: '0 15px' }} to="/login">Login</Link>
+          <Link to="/login">Login</Link>
         )}
       </div>
     </nav>

@@ -15,24 +15,28 @@ const LoginForm = ({ handleLogin }) => {
 
   return (
     <Togglable buttonLabel="Log in">
-      <form onSubmit={handleSubmit}>
+      <form className="login-form" onSubmit={handleSubmit}>
         <div>
-          username
+          <label htmlFor="username">Username</label>
           <input
+            id="username"
             type="text"
             value={username}
             onChange={({ target }) => setUsername(target.value)}
+            placeholder="Enter your username"
           />
         </div>
         <div>
-          password
+          <label htmlFor="password">Password</label>
           <input
+            id="password"
             type="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+            placeholder="Enter your password"
           />
         </div>
-        <button type="submit">login</button>
+        <button type="submit">Login</button>
       </form>
     </Togglable>
   )

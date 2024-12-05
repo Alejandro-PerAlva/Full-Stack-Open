@@ -11,7 +11,7 @@ const UserDetail = ({ users }) => {
   }
 
   return (
-    <div>
+    <div className="user-detail-container">
       <h2>{user.name}</h2>
       <h3>Blogs:</h3>
       <ul>
